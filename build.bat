@@ -1,4 +1,4 @@
-del build\firmware.uf2
+if not exist build mkdir build
 
 arm-none-eabi-as.exe -mcpu=cortex-m0plus -mthumb src\start.s -o build\start.o
 arm-none-eabi-as.exe -mcpu=cortex-m0plus -mthumb src\main.s  -o build\main.o

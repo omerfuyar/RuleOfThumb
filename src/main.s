@@ -8,6 +8,7 @@
 /* ===== RESET REGISTERS ===== */
 .equ RESETS_BASE,     0x4000C000
 .equ RESETS_CLR,      0x3000
+.equ RESETS_DONE,     0x4000C008
 
 /* Reset bits */
 .equ RESET_IO_BANK0,  (1 << 5)
@@ -31,7 +32,20 @@ main:
     /* --- Release peripheral resets --- */
     ldr r0, =RESETS_BASE
     ldr r1, =(RESET_IO_BANK0 | RESET_PADS | RESET_SIO)
-    str r1, [r0, #RESETS_CLR]
+    
+    /* FIX 1: Load offset into register to avoid "value too big" error */
+    ldr r2, =RESETS_CLR
+    str r1, [r0, r2]
+
+reset_wait:
+    /* FIX 2: Correctly wait for ALL bits to be set */
+    ldr r2, [r0, #0x8]            /* Read RESETS_DONE */
+    
+    /* Fix: Use 'ands' because M0+ AND instruction always updates flags */
+    ands r2, r1                   /* Mask out bits we don't care about */
+    
+    cmp r2, r1                    /* Check if result matches our mask exactly */
+    bne reset_wait                /* If not equal, keep waiting */
 
     /* --- Configure GPIO25 function (SIO) --- */
     ldr r0, =GPIO25_CTRL

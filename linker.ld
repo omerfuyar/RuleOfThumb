@@ -1,18 +1,20 @@
 ENTRY(_start)
 
 MEMORY {
-    FLASH (rx) : ORIGIN = 0x10000000, LENGTH = 2M
+    /* We are using RAM for everything now */
     RAM   (rwx): ORIGIN = 0x20000000, LENGTH = 256K
 }
 
 _stack_top = ORIGIN(RAM) + LENGTH(RAM);
 
 SECTIONS {
+    /* Put vectors at the start of RAM */
     .vectors : {
         KEEP(*(.vectors))
-    } > FLASH
+    } > RAM
 
+    /* Put code in RAM */
     .text : {
         *(.text*)
-    } > FLASH
+    } > RAM
 }
