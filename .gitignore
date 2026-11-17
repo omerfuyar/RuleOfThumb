@@ -11,3 +11,5 @@ build/
 *.shu
 *.out
 *.log
+
+managed_components
